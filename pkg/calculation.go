@@ -1,199 +1,137 @@
 package calculation
 
 import (
-	"encoding/json"
-	"errors"
 	"fmt"
 	"strconv"
 	"strings"
 )
 
-
-func tokeng(expres string) []string {
-    var tokens []string
-    var currentToken strings.Builder
-
-    for _, char := range expres {
-        switch char {
-        case ' ':
-            continue
-        case '+', '-', '*', '/', '(', ')':
-            if currentToken.Len() > 0 {
-                tokens = append(tokens, currentToken.String())
-                currentToken.Reset()
-            }
-            tokens = append(tokens, string(char))
-        default:
-            currentToken.WriteRune(char)
-        }
-    }
-
-    if currentToken.Len() > 0 {
-        tokens = append(tokens, currentToken.String())
-    }
-
-    return tokens
-}
-
-
-func infpf(tokens []string) ([]string, error) {
-    var output []string
-    var operators []string
-
-    for _, token := range tokens {
-        if isNumber(token) {
-            output = append(output, token)
-        } else if token == "(" {
-            operators = append(operators, token)
-        } else if token == ")" {
-            for len(operators) > 0 && operators[len(operators)-1] != "(" {
-                output = append(output, operators[len(operators)-1])
-                operators = operators[:len(operators)-1]
-            }
-            if len(operators) == 0 {
-                return nil, errors.New("incorrect input")
-            }
-            operators = operators[:len(operators)-1] 
-        } else if isOperator(token) {
-            for len(operators) > 0 && precedence(operators[len(operators)-1]) >= precedence(token) {
-                output = append(output, operators[len(operators)-1])
-                operators = operators[:len(operators)-1]
-            }
-            operators = append(operators, token)
-        } else {
-            return nil, fmt.Errorf("invalid character")
-        }
-    }
-
-    for len(operators) > 0 {
-        if operators[len(operators)-1] == "(" {
-            return nil, errors.New("incorrect input")
-        }
-        output = append(output, operators[len(operators)-1])
-        operators = operators[:len(operators)-1]
-    }
-
-    return output, nil
-}
-
-
-func evaluatepf(postfix []string) map[string]string {
-    //var jsonBytes []byte
-    var stack []float64
-    results := make(map[string]string)
-   // type Res struct {
-	   // Result float64 `json:"result"`
-	//}
-	//type Mistakes struct {
-	   // Error string`json:"error"`
-	//}
-    for _, token := range postfix {
-        if isNumber(token) {
-            num, _ := strconv.ParseFloat(token, 64)
-			stack = append(stack, num)
-		} else if !isOperator(token) {
-            results["error"] = "Expression is not valid"
-			//otv4 := Mistakes{Error: "Expression is not valid"}
-			//jsonBytes4, _ := json.Marshal(otv4)
-					
-			
-			//return jsonBytes4
+func stringToFloat64(str string) float64 {
+	degree := float64(1)
+	var res float64 = 0
+	var invers bool = false
+	for i := len(str); i > 0; i-- {
+		if str[i-1] == '-' {
+			invers = true
+		} else {
+			res += float64(9-int('9'-str[i-1])) * degree
+			degree *= 10
 		}
-
-		if len(stack) < 2 {
-			//otv1 := Mistakes{Error: `Expression is not valid`}
-			//jsonBytes7, _ := json.Marshal(otv1)
-			results["error"] = "Expression is not valid"
-				
-			//return jsonBytes7
-		}
-		b := stack[len(stack)-1]
-		a := stack[len(stack)-2]
-		stack = stack[:len(stack)-2]
-
-		switch token {
-		    case "+":
-				stack = append(stack, a+b)
-			case "-":
-				stack = append(stack, a-b)
-			case "*":
-				stack = append(stack, a*b)
-			case "/":
-				if b == 0 {
-                    results["error"] = "Expression is not valid"
-					//otv2 := Mistakes{Error: `Expression is not valid`}
-					//jsonBytes2, _ := json.Marshal(otv2)
-				
-				
-					//return jsonBytes2
-				}
-				stack = append(stack, a/b)
-			default:
-                results["error"] = "Expression is not valid"
-				//otv3 := Mistakes{Error: "Expression is not valid"}
-				//jsonBytes3, _ := json.Marshal(otv3)
-				
-				
-				//return jsonBytes3
-		}
-	
-
-		if len(stack) != 1 {
-            results["error"] = "Expression is not valid"
-			//otv5 := Mistakes{Error: `Expression is not valid`}
-			//jsonBytes5, _ := json.Marshal(otv5)
-					
-					
-			//return jsonBytes5
-		}
-        results["result"] = fmt.Sprintf("%f", stack[0])
-        return results
-		//otv := Res{Result: stack[0]}
-		//jsonBytes, _ := json.Marshal(otv) 
-		//return jsonBytes
 	}
-    return results
-	//return jsonBytes
+	if invers {
+		res = 0 - res
+	}
+	return res
 }
 
-func isNumber(token string) bool {
-    if _, err := strconv.ParseFloat(token, 64); err == nil {
-        return true
-    }
-    return false
+func isSign(value rune) bool {
+	return value == '+' || value == '-' || value == '*' || value == '/'
 }
 
-func isOperator(token string) bool {
-    return token == "+" || token == "-" || token == "*" || token == "/"
-}
+func Calc(expression string) (float64, error) {
+	if len(expression) < 3 {
+		return 0, ErrInvalidExpression
+	}
+	//////////////////////////////////////////////////////////////////////////////////////////////////////
+	var res float64
+	var b string
+	var c rune = 0
+	var resflag bool = false
+	var isc int
+	var countc int = 0
+	//////////////////////////////////////////////////////////////////////////////////////////////////////
+	for _, value := range expression {
+		if isSign(value) {
+			countc++
+		}
+	}
+	//////////////////////////////////////////////////////////////////////////////////////////////////////
+	if isSign(rune(expression[0])) || isSign(rune(expression[len(expression)-1])) {
+		return 0, ErrInvalidExpression
+	}
+	for i, value := range expression {
+		if value == '(' {
+			isc = i
+		}
+		if value == ')' {
+			calc, err := Calc(expression[isc+1 : i])
+			if err != nil {
+				return 0, ErrInvalidExpression
+			}
+			calcstr := strconv.FormatFloat(calc, 'f', 0, 64)
+			i2 := i
+			i -= len(expression[isc:i+1]) - len(calcstr)
+			expression = strings.Replace(expression, expression[isc:i2+1], calcstr, 1) // Меняем скобки на результат выражения в них
+		}
+	}
+	if countc > 1 {
+		for i := 1; i < len(expression); i++ {
+			value := rune(expression[i])
+			///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+			//Умножение и деление
+			if value == '*' || value == '/' {
+				var imin int = i - 1
+				if imin != 0 {
+					for !isSign(rune(expression[imin])) && imin > 0 {
+						imin--
+					}
+					imin++
+				}
+				var imax int = i + 1
+				if imax == len(expression) {
+					imax--
+				} else {
+					for !isSign(rune(expression[imax])) && imax < len(expression)-1 {
+						imax++
+					}
+				}
+				if imax == len(expression)-1 {
+					imax++
+				}
+				calc, err := Calc(expression[imin:imax])
+				if err != nil {
+					return 0, ErrInvalidExpression
+				}
+				calcstr := strconv.FormatFloat(calc, 'f', 0, 64)
+				i -= len(expression[isc:i+1]) - len(calcstr) - 1
+				expression = strings.Replace(expression, expression[imin:imax], calcstr, 1) // Меняем скобки на результат выражения в них
+			}
+			if value == '+' || value == '-' || value == '*' || value == '/' {
+				c = value
+			}
+		}
+	}
+	//////////////////////////////////////////////////////////////////////////////////////////////////////
+	for _, value := range expression + "s" {
+		switch {
+		case value == ' ':
+			continue
+		case value > 47 && value < 58: // Если это цифра
+			b += string(value)
+		case isSign(value) || value == 's': // Если это знак
+			if resflag {
+				switch c {
+				case '+':
+					res += stringToFloat64(b)
+				case '-':
+					res -= stringToFloat64(b)
+				case '*':
+					res *= stringToFloat64(b)
+				case '/':
+					res /= stringToFloat64(b)
+				}
+			} else {
+				resflag = true
+				res = stringToFloat64(b)
+			}
+			b = strings.ReplaceAll(b, b, "")
+			c = value
 
-func precedence(op string) int {
-    switch op {
-    case "+", "-":
-        return 1
-    case "*", "/":
-        return 2
-    default:
-        return 0
-    }
-}
-func Calc(expression string) map[string]string{
-	//type Calcul struct { 
-		//Expression string `json:"expression"`
-	//}
-	
-	//var expr []Calcul
-    f := make(map[string]string)
-    //var jsonData []byte
-    //jsonStr := `{"ex": expression}`
-	//err := json.Unmarshal([]byte(expression), &expr)
-	//if err != nil {
-		//return f
-	//}
-    tokens := tokeng(expression)
-    pf, err := infpf(tokens)
-    if err != nil {
-        return f
-    }
-    return evaluatepf(pf)
+			/////////////////////////////////////////////////////////////////////////////////////////////
+		case value == 's':
+		default:
+			return 0, fmt.Errorf("Not correct input")
+		}
+	}
+	return res, nil
 }

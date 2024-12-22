@@ -40,29 +40,38 @@ func New() *Application {
 // тут будем чиать введенную строку и после нажатия ENTER писать результат работы программы на экране
 // если пользователь ввел exit - то останаваливаем приложение
 func (a *Application) Run() error {
+	type Request struct {
+		Expression string`json:"expression"`
+	 }
+	type Res struct {
+		Result float64`json:"result"`
+	}
+	type Mistakes struct {
+		Error error`json:"error"`
+	}
 	//a := make([]string, 3)
-	var w []string
-	for {
+	//var w []string
+	//for {
 		// читаем выражение для вычисления из командной строки
-		log.Println("input expression")
-		reader := bufio.NewReader(os.Stdin)
-		for { 
-			line, err := reader.ReadString('\n') 
+		//log.Println("input expression")
+		//reader := bufio.NewReader(os.Stdin)
+		//for { 
+			//line, err := reader.ReadString('\n') 
 
-			if err != nil { 
-				if err == io.EOF { 
-					break
-				} else { 
-					fmt.Println(err) 
-				} 
-			} 
-			w = append(w, line)
+			//if err != nil { 
+			//	if err == io.EOF { 
+				//	break
+				//} else { 
+				//	fmt.Println(err) 
+				//} 
+			//} 
+			//w = append(w, line)
 			
 			//fmt.Print(line) 
-		}
+		//}
 		
-		t := strings.Split(w[1], " ")
-		text := string(t[1])
+		//t := strings.Split(w[1], " ")
+		//text := string(t[1])
 		// убираем пробелы, чтобы оставить только вычислемое выражение
 		//text = strings.TrimSpace(text)
 		// выходим, если ввели команду "exit"
@@ -71,18 +80,23 @@ func (a *Application) Run() error {
 			//return nil
 		//}
 		//вычисляем выражение
-		result, err := calculation.Calc(text)
+		result, err := calculation.Calc(request.Expression)
 		if err != nil {
-			log.Println(text, " calculation failed wit error: ", err)
+			w.WriteHeader(http.StatusBadRequest)
+			//log.Println({"error": "wrong requestion"})
+			answer := Mistakes{Error: err}
+			json.NewEncoder(w).Encode(answer)
 		} else {
-			log.Println(text, "=", result)
+			answer := {Result: result}
+			json.NewEncoder(w).Encode(answer)
+			//log.Println(text, "=", result)
 		}
-	}
 }
 
-type Request struct {
-	Expression string `json:"expression"`
-}
+
+//type Request struct {
+	//Expression string `json:"expression"`
+//}
 
 func CalcHandler(w http.ResponseWriter, r *http.Request) {
 	request := new(Request)
