@@ -35,20 +35,20 @@ func New() *Application {
 		config: ConfigFromEnv(),
 	}
 }
-
+type Request struct {
+	Expression string`json:"expression"`
+ }
+type Res struct {
+	Result float64`json:"result"`
+}
+type Mistakes struct {
+	Error error`json:"error"`
+}
 // Функция запуска приложения
 // тут будем чиать введенную строку и после нажатия ENTER писать результат работы программы на экране
 // если пользователь ввел exit - то останаваливаем приложение
 func (a *Application) Run() error {
-	type Request struct {
-		Expression string`json:"expression"`
-	 }
-	type Res struct {
-		Result float64`json:"result"`
-	}
-	type Mistakes struct {
-		Error error`json:"error"`
-	}
+
 	//a := make([]string, 3)
 	//var w []string
 	//for {
