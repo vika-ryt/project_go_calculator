@@ -80,17 +80,17 @@ func (a *Application) Run() error {
 			//return nil
 		//}
 		//вычисляем выражение
-		result, err := calculation.Calc(request.Expression)
-		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
+	result, err := calculation.Calc(request.Expression)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
 			//log.Println({"error": "wrong requestion"})
-			answer := Mistakes{Error: err}
-			json.NewEncoder(w).Encode(answer)
-		} else {
-			answer := {Result: result}
-			json.NewEncoder(w).Encode(answer)
+		answer := Mistakes{Error: err}
+		json.NewEncoder(w).Encode(answer)
+	} else {
+		answer := {Result: result}
+		json.NewEncoder(w).Encode(answer)
 			//log.Println(text, "=", result)
-		}
+	}
 }
 
 
@@ -110,16 +110,19 @@ func CalcHandler(w http.ResponseWriter, r *http.Request) {
 	result, err := calculation.Calc(request.Expression)
 	if err != nil {
 		if errors.Is(err, calculation.ErrInvalidExpression) {
-			fmt.Fprintf(w, "err: %s", err.Error())
+			answer := Mistakes{Error: "Expression is not valid"}
+		    json.NewEncoder(w).Encode(answer)
 			w.WriteHeader(http.StatusBadRequest)
 		} else {
-			fmt.Fprintf(w, "unknown err")
+			answer := Mistakes{Error: "Internal server error"}
+		    json.NewEncoder(w).Encode(answer)
 			w.WriteHeader(http.StatusInternalServerError)
 		}
 
 	} else {
-		fmt.Fprintf(w, "result: %f", result)
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		answer := {Result: result}
+		json.NewEncoder(w).Encode(answer)
+		http.Error(w, err.Error(), http.StatusOK)
 	}
 	w.WriteHeader(http.StatusOK)
 }
