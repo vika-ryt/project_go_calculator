@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"errors"
 )
 
 func stringToFloat64(str string) float64 {
@@ -118,7 +119,11 @@ func Calc(expression string) (float64, error) {
 				case '*':
 					res *= stringToFloat64(b)
 				case '/':
-					res /= stringToFloat64(b)
+					if b != 0 {
+					    res /= stringToFloat64(b)
+					} else {
+						return 0, errors.New("division by zero is not allowed")
+					}
 				}
 			} else {
 				resflag = true
