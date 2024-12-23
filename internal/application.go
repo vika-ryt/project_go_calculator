@@ -49,36 +49,6 @@ type Mistakes struct {
 // если пользователь ввел exit - то останаваливаем приложение
 func (a *Application) Run() error {
 
-	//a := make([]string, 3)
-	//var w []string
-	//for {
-		// читаем выражение для вычисления из командной строки
-		//log.Println("input expression")
-		//reader := bufio.NewReader(os.Stdin)
-		//for { 
-			//line, err := reader.ReadString('\n') 
-
-			//if err != nil { 
-			//	if err == io.EOF { 
-				//	break
-				//} else { 
-				//	fmt.Println(err) 
-				//} 
-			//} 
-			//w = append(w, line)
-			
-			//fmt.Print(line) 
-		//}
-		
-		//t := strings.Split(w[1], " ")
-		//text := string(t[1])
-		// убираем пробелы, чтобы оставить только вычислемое выражение
-		//text = strings.TrimSpace(text)
-		// выходим, если ввели команду "exit"
-		//if text == "exit" {
-			//log.Println("aplication was successfully closed")
-			//return nil
-		//}
 		//вычисляем выражение
 	result, err := calculation.Calc(request.Expression)
 	if err != nil {
