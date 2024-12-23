@@ -28,5 +28,22 @@
 Вывод: {
     "error": "Expression is not valid"
 }, 422
+Curl
+curl --location 'http://localhost:8080/api/v1/calculate' \
+--header 'Content-Type: application/json' \
+--data '{
+  "expression": "2+2*2"
+}'
+
+Вывод:
+{"result":"6"}
+curl --location 'http://localhost:8080/api/v1/calculate' \
+--header 'Content-Type: application/json' \
+--data '{
+  "expression": "2ab + c - d"
+}'
+
+Вывод:
+{"error": "Expression is not valid"}
 Для запуска проекта:
 go run ./cmd/main.go
