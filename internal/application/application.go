@@ -10,7 +10,7 @@ import (
 	"os"
 	"strings"
     "io"
-	"github.com/vika-ryt/project_go_calculator/pkg"
+	"github.com/vika-ryt/workspace/project_go_calculator/pkg/calculation"
 )
 
 type Config struct {
