@@ -57,7 +57,7 @@ func (a *Application) Run() error {
 		answer := Mistakes{Error: err}
 		json.NewEncoder(w).Encode(answer)
 	} else {
-		answer := {Result: result}
+		answer := Res{Result: result}
 		json.NewEncoder(w).Encode(answer)
 			//log.Println(text, "=", result)
 	}
