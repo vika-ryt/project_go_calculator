@@ -6,7 +6,7 @@ import (
 	"testing"
     
 	"net/http/httptest"
-	"github.com/vika-ryt/project_go_calculator/internal/application"
+	"github.com/vika-ryt/project_go_calculator/pkg/calculation"
 )
 
 func TestCalcHandlerSuccessCase(t *testing.T) {

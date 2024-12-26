@@ -10,7 +10,7 @@ import (
 	"os"
 	"strings"
     "io"
-	"github.com/vika-ryt/workspace/project_go_calculator/pkg/calculation"
+	"github.com/vika-ryt/project_go_calculator/pkg/calculation"
 )
 
 type Config struct {
@@ -54,7 +54,7 @@ func (a *Application) Run() error {
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 			//log.Println({"error": "wrong requestion"})
-		answer := Mistakes{Error: err}
+		answer := Mistakes{Error: "Internal server error"}
 		json.NewEncoder(w).Encode(answer)
 	} else {
 		answer := Res{Result: result}
