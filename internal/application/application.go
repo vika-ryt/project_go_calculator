@@ -37,7 +37,7 @@ func New() *Application {
 }
 type Request struct {
 	Expression string`json:"expression"`
- }
+}
 type Res struct {
 	Result float64`json:"result"`
 }
